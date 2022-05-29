@@ -245,11 +245,11 @@ function BLBFOR.open(file, mode, width, height, FG, BG, SYM)
     BLBFOR.INTERNAL.ASSERT(EXT==".blbfor","file must be a .blbfor file")
     local image = {}
     if mode:sub(1,1):lower() == "w" then
-        EXPECT(2,width,"number")
-        EXPECT(3,height,"number")
-        EXPECT(4,SYM,"string","nil")
+        EXPECT(3,width,"number")
+        EXPECT(4,height,"number")
         EXPECT(5,FG,"number","nil")
         EXPECT(6,BG,"number","nil")
+        EXPECT(7,SYM,"string","nil")
         local stream = fs.open(file,"wb")
         if not stream then error("Could not open file",2) end
         image.width = width
