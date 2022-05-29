@@ -269,6 +269,9 @@ function BLBFOR.open(file, mode, width, height, FG, BG, SYM)
     elseif mode:sub(1,1):lower() == "r" then
         local stream = fs.open(file,"rb")
         if not stream then error("Could not open file",2) end
+        local pos = stream.seek("cur")
+        image.raw = stream.readAll()
+        stream.seek("set",pos)
         image.stream = stream
         BLBFOR.INTERNAL.DECODE(image)
         image.closed = true
