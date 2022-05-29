@@ -5,7 +5,7 @@
     * 1 pixel == 2 bytes
 ]]
 
-local EXPECT = require("cc.expect")
+local EXPECT = require("cc.expect").expect
 
 local SEPARATION_CHAR = 0x0A
 local INT_BYTE_OFFSET = 0x30
