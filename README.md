@@ -1,2 +1,2 @@
 # BLBFOR
-A computer byte blit format
+A Computercraft byte blit format
