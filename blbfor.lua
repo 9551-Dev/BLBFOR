@@ -103,7 +103,11 @@ function BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web)
     local raw = web.readAll()
     web.close()
 
-    local bytes = {raw:byte(1, -1)}
+    local bytes = {}
+    for c in raw:gmatch(".") do
+        table.insert(bytes, c:byte())
+    end
+
     local stream = {}
 
     local _CURSOR = 1
