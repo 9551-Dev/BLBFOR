@@ -109,6 +109,7 @@ end
 
 function BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web)
     local raw = web.readAll()
+    web.close()
 
     local parts = BLBFOR.INTERNAL.STRING.PART(raw,5000)
     local byte_arrays = {}
