@@ -99,6 +99,27 @@ function BLBFOR.INTERNAL.WRITE_HEADER(image)
     )
 end
 
+function BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web)
+    local raw = web.readAll()
+    web.close()
+
+    local bytes = {raw:byte(1, -1)}
+    local stream = {}
+
+    local _CURSOR = 1
+    function stream.seek(mode, arg)
+        if mode == "cur" then return _CURSOR - 1
+        elseif mode == "set" then _CURSOR = arg + 1; return arg + 1 end
+    end
+    function stream.read()
+        local byte = bytes[_CURSOR]
+        _CURSOR = _CURSOR + 1
+        return byte
+    end
+    function stream.close() end
+    return stream,raw
+end
+
 function BLBFOR.INTERNAL.ASSERT(bool,msg)
     if not bool then error(msg,3)
     else return bool end
@@ -310,6 +331,17 @@ function BLBFOR.open(file, mode, width, height, layers, FG, BG, SYM, meta)
         stream.close()
         error("invalid mode. please use \"w\" or \"r\" (Write/Read)",2)
     end
+end
+
+function BLBFOR.open_url(url)
+    EXPECT(1, url, "string")
+    local web_handle,err_reason = http.get(url, nil, true)
+    if not web_handle then error("Could not get image. " .. err_reason, 2) end
+    local image = {}
+    image.stream,image.raw = BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web_handle)
+    BLBFOR.INTERNAL.DECODE(image)
+    image.closed = true
+    return setmetatable(image, { __index = BLBFOR_READ_HANDLE })
 end
 
 return BLBFOR
