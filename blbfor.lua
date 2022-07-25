@@ -99,13 +99,22 @@ function BLBFOR.INTERNAL.WRITE_HEADER(image)
     )
 end
 
+function BLBFOR.INTERNAL.STRING.PART(str,part_size)
+    local parts = {}
+    for i = 1, #str, part_size do
+        parts[#parts+1] = str:sub(i, i+part_size-1)
+    end
+    return parts
+end
+
 function BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web)
     local raw = web.readAll()
-    web.close()
 
-    local bytes = {}
-    for c in raw:gmatch(".") do
-        table.insert(bytes, c:byte())
+    local parts = BLBFOR.INTERNAL.STRING.PART(raw,5000)
+    local byte_arrays = {}
+
+    for part,bytes in ipairs(parts) do
+        byte_arrays[part] = {bytes:byte(1,-1)}
     end
 
     local stream = {}
@@ -116,7 +125,8 @@ function BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web)
         elseif mode == "set" then _CURSOR = arg + 1; return arg + 1 end
     end
     function stream.read()
-        local byte = bytes[_CURSOR]
+        local part = math.ceil(_CURSOR/5000)
+        local byte = byte_arrays[part][(_CURSOR-1)%5000+1]
         _CURSOR = _CURSOR + 1
         return byte
     end
@@ -344,6 +354,7 @@ function BLBFOR.open_url(url)
     local image = {}
     image.stream,image.raw = BLBFOR.INTERNAL.EMULATE_FS_BINARY_HANDLE(web_handle)
     BLBFOR.INTERNAL.DECODE(image)
+    image.stream.close()
     image.closed = true
     return setmetatable(image, { __index = BLBFOR_READ_HANDLE })
 end
