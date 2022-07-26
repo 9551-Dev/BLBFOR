@@ -203,6 +203,8 @@ function BLBFOR.INTERNAL.DECODE(image)
             end
             image.data[layer][y] = xlist
         end
+        os.queueEvent("yield")
+        os.pullEvent()
     end
     image.lines = lines
 end
