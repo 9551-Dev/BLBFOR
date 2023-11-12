@@ -153,10 +153,13 @@ end
 
 function BLBFOR.INTERNAL.ENCODE(self)
     BLBFOR.INTERNAL.WRITE_HEADER(self)
-    for layer_index,layer in ipairs(self.data) do
-        for y,xlist in ipairs(layer) do
+    for layer_index=1,#self.data do
+        local layer = self.data[layer_index]
+        for y=1,#layer do
+            local xlist = layer[y]
             local bytes = {}
-            for x,pixel in ipairs(xlist) do
+            for x=1,#xlist do
+                local pixel = xlist[x]
                 table.insert(bytes,pixel[1])
                 table.insert(bytes,BLBFOR.INTERNAL.COLORS_TO_BYTE(2^pixel[2],2^pixel[3]))
             end
@@ -319,7 +322,7 @@ function BLBFOR.open(file, mode, width, height, layers, FG, BG, SYM, meta)
         image.width = width
         image.height = height
         image.layers = layers
-        image.data = BLBFOR.INTERNAL.createNDarray(3)
+        image.data = BLBFOR.INTERNAL.createNDarray(2)
         image.stream = stream
         for layer_index=1,layers do
             for x=1,width do
